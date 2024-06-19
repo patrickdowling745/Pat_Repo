@@ -2,3 +2,4 @@ streamlit
 pandas
 sodapy
 python-dateutil
+requests
