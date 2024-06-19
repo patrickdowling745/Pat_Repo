@@ -8,7 +8,7 @@ import requests
 st.title("Property Tax Data Search")
 
 #subheader below 
-st.subheader('In order to use this application, upload a CSV file with the first column = Parcel ID. This application works for the following counties: Cook County, IL')
+st.write('In order to use this application, upload a CSV file with the first column = Parcel ID. This application works for the following counties: Cook County, IL')
 
 # Create a file uploader widget
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
