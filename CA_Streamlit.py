@@ -1,16 +1,29 @@
 import streamlit as st
 import pandas as pd
 from sodapy import Socrata
-import logging
-import requests
+from datetime import datetime
+import os
+
+current_year = datetime.now().year
+previous_year = current_year - 1
+
+# Socrata API credentials
+app_token = "QQBG9q4gt1NIrzOf0IFuI6oNn"
+username = "aaron@taxproper.com"
+password = "27rmaK*LTwvKcmeJcf!L"
 
 # Set the title of the app
 st.title("Property Tax Data Search")
 
-#subheader below 
-st.write('In order to use this application, upload a CSV file with the first column = Parcel ID. This application works for the following counties: Cook County, IL')
+st.markdown("""
+        This app allows you to fetch property tax data from counties using APNs. <br> <br>
+        **Directions**: Upload a CSV file with APNs in the first column and the county name in the second column. Click the button to fetch the data. <br>
+         """, unsafe_allow_html=True)
 
-# Create a file uploader widget
+st.markdown("""The following counties are supported: <br>
+            **Cook County, IL**""", unsafe_allow_html=True)
+
+# Create a file uploader and convert the file into a dataframe
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
 if uploaded_file is not None:
@@ -23,11 +36,10 @@ if uploaded_file is not None:
 
     # Cook County, IL API Connection
     def cook_IL(parcel_ids):
-        # Define your credentials directly in the script
-        app_token = "QQBG9q4gt1NIrzOf0IFuI6oNn"
-        username = "aaron@taxproper.com"
-        password = "27rmaK*LTwvKcmeJcf!L"
-
+        # Generate a unique filename based on the current date and time
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"Results_{timestamp}.csv"
+      
         # Authenticated client for non-public datasets
         client = Socrata(
             "datacatalog.cookcountyil.gov",
@@ -38,11 +50,8 @@ if uploaded_file is not None:
 
         # Create a condition string for the API query
         parcel_ids_condition = " OR ".join([f"pin='{pid}'" for pid in parcel_ids])
-        tax_year_condition = "(tax_year='2024' OR tax_year IS NULL)"
+        tax_year_condition = f"(tax_year='{current_year}' OR tax_year='{previous_year}')"
         where_clause = f"({parcel_ids_condition}) AND {tax_year_condition}"
-
-        # Initialize a flag for the header
-        write_header = True
 
         try:
             # Fetch a chunk of data with filtering
@@ -52,30 +61,32 @@ if uploaded_file is not None:
             results_df = pd.DataFrame.from_records(results)
 
             if not results_df.empty:
-                # Save the results to a CSV file in append mode
-                results_df.to_csv('cook_IL.csv', mode='a', header=write_header, index=False)
-                
-                # After writing the first chunk, disable header writing
-                write_header = False
-
-            st.success("Data has been fetched and saved to cook_IL.csv")
-        except requests.exceptions.HTTPError as http_err:
-            logging.error(f"HTTP error occurred: {http_err}")
-            logging.error(f"Response content: {http_err.response.content}")
-            st.error("HTTP error occurred while fetching data.")
-        except Exception as err:
-            logging.error(f"An error occurred: {err}")
-            st.error("An error occurred while fetching data.")
+                # Save the results to a CSV file
+                results_df.to_csv(filename, index=False)
+                st.success(f"Data has been fetched and saved to {filename}")
+                return filename
+            else:
+                st.error("No data found for the given APNs.")
+                return None
+        except Exception as e:
+            st.error(f"An error occurred while fetching data: {e}")
+            return None
 
     # Add a button to trigger the API connection and data fetching
-    if st.button('Fetch Property Tax Data'):
-        cook_IL(APN_List)
+    if 'Cook' in df.iloc[:, 1].values:
+        # Display Button to fetch Cook, IL Property Tax Data
+        if st.button('Fetch Cook, IL Property Tax Data'):
+            generated_filename = cook_IL(APN_List)
 
-    # Read the saved CSV file
-    with open('cook_IL.csv', 'rb') as file:
-        st.download_button(
-            label="Download CSV",
-            data=file,
-            file_name='cook_IL.csv',
-            mime='text/csv'
-        )
+            # Provide a download button for the newly created file if it exists
+            if generated_filename and os.path.exists(generated_filename):
+                with open(generated_filename, 'rb') as file:
+                    st.download_button(
+                        label="Download CSV",
+                        data=file,
+                        file_name=generated_filename,
+                        mime='text/csv'
+                    )
+else:
+    st.info("No file uploaded.")
+
