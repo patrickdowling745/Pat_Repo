@@ -4,14 +4,27 @@ import pandas as pd
 from datetime import datetime
 
 # Set the page title and favicon
-st.set_page_config(page_title="Sarah Ulrich's Dashboard", page_icon="🌟")
+st.set_page_config(page_title="Sarah Ulrich's Dashboard", page_icon="🌟", layout="wide")
+
+# Apply custom CSS for background color
+st.write(
+    """
+    <style>
+    .main {
+        background-color: #333;
+        color: #f1f1f1;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # Header for the dashboard
 st.header("Welcome to Sarah Ulrich's Dashboard!")
 
 # Display an image of Hillsboro Village, Nashville
-image_url = 'https://vanderbilthustler.com/wp-content/uploads/2022/10/hillsboro-featured-image-Edited.png'
-st.image(image_url, caption='Hillsboro Village, Nashville', use_column_width=True)
+image_path = 'path/to/your/local/image.jpg'  # Replace with the actual path to your local image
+st.image(image_path, caption='Hillsboro Village, Nashville', use_column_width=True)
 
 # OpenWeather API credentials
 api_key_weather = '4e7e8ba154896ec1ce4c22939d4112d9'
@@ -31,19 +44,12 @@ fahrenheit = round((kelvin - 273.15) * 9/5 + 32)
 clouds = weather_data['clouds']['all']
 wind = round(weather_data['wind']['speed'] * 2.23694)
 
-# Display the weather information in a styled box
-st.markdown(
-    f"""
-    <div style="background-color: #ADD8E6; padding: 10px; border-radius: 10px; border: 1px solid #ddd;">
-        <h2 style="color: #333;">Current Weather in Nashville</h2>
-        <p style="font-size: 18px; color: #555;">
-            The temperature is currently <b>{fahrenheit}°F</b>, the cloud coverage is roughly <b>{clouds}%</b>,
-            and the wind speed is <b>{wind} mph</b>.
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# Display the weather information using Streamlit's built-in components
+with st.container():
+    st.subheader("Current Weather in Nashville")
+    st.write(f"**Temperature:** {fahrenheit}°F")
+    st.write(f"**Cloud Coverage:** {clouds}%")
+    st.write(f"**Wind Speed:** {wind} mph")
 
 # Function to fetch upcoming events
 def get_upcoming_events(api_key, city='Nashville'):
@@ -111,11 +117,7 @@ events = get_upcoming_events(api_key_events)
 
 if events:
     events_df = create_events_dataframe(events)
-    st.table(events_df.style
-             .set_table_styles([
-                 {'selector': 'th', 'props': [('font-size', '16px'), ('text-align', 'center')]},
-                 {'selector': 'td', 'props': [('font-size', '14px'), ('text-align', 'center')]}
-             ])
-    )
+    st.table(events_df)
 else:
     st.write("No upcoming events found.")
+
