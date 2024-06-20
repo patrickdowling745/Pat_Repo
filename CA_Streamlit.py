@@ -84,8 +84,7 @@ if uploaded_file is not None:
         #API Token 
         token = '7df3c7e8-4674-4f40-8f61-c34dfb7e9a90'
         
-        #URL for API 
-        url = f'https://mcassessor.maricopa.gov/parcel/{parcel}/valuations'
+      
         
         #Headers for API 
         headers = {
@@ -96,7 +95,7 @@ if uploaded_file is not None:
         all_results = []
         
         for parcel in parcel_ids:
-            url = f'https://mcassessor.maricopa.gov/parcel/{parcel}/propertyinfo'
+            url = f'https://mcassessor.maricopa.gov/parcel/{parcel}/valuations'
             try:
                 # Fetch data for each parcel
                 response = requests.get(url, headers=headers)
