@@ -3,6 +3,7 @@ import pandas as pd
 from sodapy import Socrata
 from datetime import datetime
 import os
+from bs4 import BeautifulSoup as soup
 import requests
 
 
@@ -83,8 +84,7 @@ if uploaded_file is not None:
         
         #API Token 
         token = '7df3c7e8-4674-4f40-8f61-c34dfb7e9a90'
-        
-      
+    
         
         #Headers for API 
         headers = {
@@ -95,7 +95,7 @@ if uploaded_file is not None:
         all_results = []
         
         for parcel in parcel_ids:
-            url = f'https://mcassessor.maricopa.gov/parcel/{parcel}/valuations'
+            url = f'https://mcassessor.maricopa.gov/parcel/{parcel}/propertyinfo'
             try:
                 # Fetch data for each parcel
                 response = requests.get(url, headers=headers)
@@ -107,7 +107,7 @@ if uploaded_file is not None:
         
         # Convert the list of results to a DataFrame
         if all_results:
-            results_df = pd.DataFrame(all_results)
+            results_df = pd.json_normalize(all_results)
             # Save the results to a CSV file
             results_df.to_csv(filename, index=False)
             st.success(f"Data has been fetched and saved to {filename}")
@@ -150,6 +150,10 @@ if uploaded_file is not None:
                         file_name=generated_filename,
                         mime='text/csv'
                     )
+
+else:
+    st.info("No file uploaded.")
+
 
 else:
     st.info("No file uploaded.")
