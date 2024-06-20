@@ -94,7 +94,7 @@ if uploaded_file is not None:
         all_results = []
         
         for parcel in parcel_ids:
-            url = f'https://mcassessor.maricopa.gov/parcel/{parcel}/propertyinfo'
+            url = f'https://mcassessor.maricopa.gov/parcel/{parcel}/valuations '
             try:
                 # Fetch data for each parcel
                 response = requests.get(url, headers=headers)
