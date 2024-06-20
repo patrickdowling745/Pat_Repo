@@ -99,8 +99,15 @@ if uploaded_file is not None:
                 # Fetch data for each parcel
                 response = requests.get(url, headers=headers)
                 response.raise_for_status()  # Raise an HTTPError for bad responses
+
+                # Parse the JSON response
                 parcel_data = response.json()
-                all_results.append(parcel_data)
+                
+                #append each valuation data dictionary to the results list
+                for valuation in parcel_data:
+                    valuation['parcel'] = parcel
+                    all_results.append(valuation)
+            
             except requests.exceptions.RequestException as e:
                 st.error(f"An error occurred while fetching data for parcel {parcel}: {e}")
         
