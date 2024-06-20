@@ -3,7 +3,6 @@ import pandas as pd
 from sodapy import Socrata
 from datetime import datetime
 import os
-from bs4 import BeautifulSoup as soup
 import requests
 
 
