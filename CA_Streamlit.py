@@ -85,7 +85,7 @@ if uploaded_file is not None:
         token = '7df3c7e8-4674-4f40-8f61-c34dfb7e9a90'
         
         #URL for API 
-        url = f'https://mcassessor.maricopa.gov/parcel/{parcel_ids}/propertyinfo'
+        url = f'https://mcassessor.maricopa.gov/parcel/{parcel}/valuations'
         
         #Headers for API 
         headers = {
